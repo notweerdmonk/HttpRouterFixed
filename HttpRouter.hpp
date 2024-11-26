@@ -10,7 +10,7 @@
 // placeholder
 struct string_view {
     const char *data;
-    unsigned int length;
+    std::size_t length;
 };
 
 std::ostream &operator<<(std::ostream &os, string_view &s) {
@@ -61,7 +61,9 @@ private:
         return nodeLength;
     }
 
-    inline const char *find_node(const char *parent_node, const char *name, int name_length) {
+    inline const char *find_node(const char *parent_node, const char *name,
+        std::size_t name_length) {
+
         unsigned short nodeLength = *(unsigned short *) &parent_node[0];
         unsigned short nodeNameLength = *(unsigned short *) &parent_node[2];
 
