@@ -3,6 +3,35 @@
 #include <iostream>
 #include <chrono>
 
+static inline uint64_t rdtsc() {
+    uint32_t lo, hi;
+    asm volatile ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((uint64_t)hi << 32) | lo;
+}
+
+static
+void calculate_cpu_clock_speed() {
+    uint64_t start, end;
+    std::chrono::duration<double> elapsed;
+
+    // Get TSC and time at start
+    start = rdtsc();
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    // Busy-wait loop (~1 ms)
+    do {
+      auto end_time = std::chrono::high_resolution_clock::now();
+      elapsed = end_time - start_time;
+    } while (elapsed.count() < 0.001);
+
+    end = rdtsc();
+
+    double fcpu_hz = (end - start) / elapsed.count();
+    double fcpu_ghz = fcpu_hz / 1e9;
+
+    std::cout << "CPU freq: " << fcpu_ghz << " GHz\n";
+}
+
 void benchmark_routes() {
     struct UserData {
         int routed = 0;
@@ -47,7 +76,7 @@ void benchmark_routes() {
         }
         auto stop = std::chrono::high_resolution_clock::now();
         unsigned int ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-        std::cout << "[" << int(10000.0 / ms) << " million req/sec] for URL: " << test_url << std::endl;
+        std::cout << "[" << 10000.0 / ms << " million req/sec] for URL: " << test_url << std::endl;
     }
 
     std::cout << "Checksum: " << userData.routed << std::endl << std::endl;
@@ -119,6 +148,9 @@ void demo_routes() {
 }
 
 int main() {
-    benchmark_routes();
+    calculate_cpu_clock_speed();
+    std::cout << "\nDemo\n\n";
     demo_routes();
+    std::cout << "\nBenchmark\n\n";
+    benchmark_routes();
 }
