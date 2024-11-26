@@ -167,9 +167,14 @@ public:
         compile_tree(tree);
     }
 
-    void route(const char *method, unsigned int method_length, const char *url, unsigned int url_length, USERDATA userData) {
-        handlers[lookup(url, url_length)](userData, params);
-        params.clear();
+    void route(const char *method, unsigned int method_length, const char *url,
+            unsigned int url_length, USERDATA userData) {
+
+        auto handler_id = lookup(url, url_length);
+        if (handler_id > -1 && handler_id < handlers.size()) {
+            handlers[handler_id](userData, params);
+            params.clear();
+        }
     }
 };
 
