@@ -77,6 +77,22 @@ void demo_routes() {
         std::cout << "Serving file: " << args[0] << std::endl;
     });
 
+    r.add("GET", "/:page/:username", [](UserData *user, auto &args) {
+        std::cout << "Serving page: " << args[0] << " username: " << args[1] << std::endl;
+    });
+
+    r.add("GET", "/service/:kind/dash/:type", [](UserData *user, auto &args) {
+        std::cout << "Serving kind: " << args[0] << " type: " << args[1] << std::endl;
+    });
+
+    r.add("GET", "/service/:name/query/:querystr", [](UserData *user, auto &args) {
+        std::cout << "Serving sevice name: " << args[0] << " query: " << args[1] << std::endl;
+    });
+
+    r.add("GET", "/service/*/logs", [](UserData *user, auto &args) {
+        std::cout << "Now serving logs" << std::endl;
+    });
+
     // run benchmark of various urls
     std::vector<std::string> test_urls = {
         "/service/candy/lollipop",
@@ -87,7 +103,13 @@ void demo_routes() {
         "/service/shutdown",
         "/",
         "/some_file.html",
-        "/another_file.jpeg"
+        "/another_file.jpeg",
+
+        "/1/admin",
+        "/service/cheese/dash/mozarella",
+        "/service/cheese/query/name",
+        "/service/mail/logs",
+        "/service/upkeep/logs"
     };
 
     for (std::string &test_url : test_urls) {
