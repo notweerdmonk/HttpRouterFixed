@@ -234,8 +234,9 @@ private:
 #endif
 
     // returns next slash from start or end
-    inline const char *getNextSegment(const char *start, const char *end) {
-        const char *stop = (const char *) memchr(start, '/', end - start);
+    inline const char *getNextSegment(const char *start, const char *end,
+            char delimiter = '/') {
+        const char *stop = (const char *) memchr(start, delimiter, end - start);
         return stop ? stop : end;
     }
 
@@ -254,12 +255,8 @@ private:
     inline int lookup(const char *url, int length) {
 
         const char *treeStart = (char *) compiled_tree.data();
-        const char *stop, *start = url, *end_ptr = url + length;
-
-        /* Ignore trailing slash */
-        if (*end_ptr == '/') {
-            ++end_ptr;
-        }
+        const char *stop, *start = url;
+        const char *end_ptr = getNextSegment(url, url + strlen(url), '?');
 
         s.clear();
 
@@ -285,14 +282,14 @@ private:
                 continue;
             }
 
-            /* Check if we have reached the end of URL string */
-            if (stop == end_ptr) {
-                break;
-            }
-
             /* Move to next URL segment */
             start = stop + 1;
 
+            /* Check if we have reached the end of URL string */
+            if (stop == end_ptr || start == end_ptr) {
+                break;
+            }
+            
             /* Push children on to stack */
             push_children(start, treeStart, frame.params_idx);
         }
@@ -334,7 +331,10 @@ public:
         std::vector<std::string> nodes;
         nodes.push_back(method);
 
-        const char *stop, *start = pattern, *end_ptr = pattern + strlen(pattern);
+        const char *stop, *start = pattern;
+        const char *end_ptr =
+            getNextSegment(pattern, pattern + strlen(pattern), '?');
+
         do {
             stop = getNextSegment(start, end_ptr);
 
@@ -343,7 +343,7 @@ public:
             nodes.push_back(std::string(start, stop - start));
 
             start = stop + 1;
-        } while (stop != end_ptr);
+        } while (stop != end_ptr && start != end_ptr);
 
 
         // if pattern starts with / then move 1+ and run inline slash parser

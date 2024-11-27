@@ -134,11 +134,11 @@ void demo_routes() {
         "/some_file.html",
         "/another_file.jpeg",
 
-        "/1/admin",
+        "/1/admin/",
         "/service/cheese/dash/mozarella",
-        "/service/cheese/query/name",
+        "/service/cheese/query/name/",
         "/service/mail/logs",
-        "/service/upkeep/logs"
+        "/service/upkeep/logs/?time=1732666926"
     };
 
     for (std::string &test_url : test_urls) {
