@@ -256,7 +256,7 @@ private:
 
         const char *treeStart = (char *) compiled_tree.data();
         const char *stop, *start = url;
-        const char *end_ptr = getNextSegment(url, url + strlen(url), '?');
+        const char *end_ptr = getNextSegment(url, url + length, '?');
 
         s.clear();
 
